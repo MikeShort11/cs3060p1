@@ -1,0 +1,243 @@
+Objective
+
+In this assignment, you will write a C program for working with bank accounts. Your program will use pointers, structs, arrays, and null-terminated strings. You should have experience working with these things from CS 2370.
+
+You might need to review some of these topics, and look some things up, but you should write this program without help from the teacher, tutors, IAs, other students, or anyone else, and without help from AI. If you are not able to write this program on your own, without getting help from anyone, and with no help from AI, you are not ready to take this class and you should not stay in the class this term.
+
+As with every programming assignment in this class, make sure that your program compiles and runs on the class server. You won't get any credit for programs that don't run on the server.
+Rationale
+
+The purpose of this assignment is to help you decide whether you are prepared for the C programming assignments in this class. This assignment also gives you practice working with open-source development tools on the server and practice working with some things in C that are less commonly used in C++.
+Part 1
+
+In a file named account.c implement all of the functions declared in the account.h file. It's important that you understand everything in account.h, so if there is anything in it that you don't understand, look it up. Make sure that your account.c file works with the following file (main1.c) and produces the output shown below.
+
+All amounts and balances should be positive. Amounts for withdrawals should not be greater than the account balance, and amounts for transfers should not be greater than the balance of the source account. If any of these constraints are violated then the transaction should not be executed and the function should return a negative integer as its return value.
+
+The only function that should print anything is account_print.
+
+Use a command line like this to compile your program:
+
+gcc -o main1 main1.c account.c
+
+That command line tells the compiler to compile main1.c and account.c and to make an executable file named main1.
+
+account.h
+
+#include <string.h>
+
+#define MAX_NAME_LEN (100)
+
+typedef struct {
+  int id;
+  int balance;
+  char owner[MAX_NAME_LEN]; // USED FOR A STRING
+} Account;
+
+int account_init(Account *acct_p, int id, int balance, char *owner);
+int account_deposit(Account *acct_p, int amount);
+int account_withdraw(Account *acct_p, int amount);
+int account_transfer(Account *from_p, Account *to_p, int amount);
+int account_print(Account *acct_p);
+
+Link to download file: account.h
+
+Download account.h
+
+main1.c
+
+#include <stdio.h>
+#include "account.h"
+
+int main(int argc, char *argv[]) {
+  Account a1, a2;
+  account_init(&a1, 1, 1000, "Hermione Granger");
+  account_init(&a2, 2, 500, "Jack Swallow");
+  account_deposit(&a1, 500);
+  account_withdraw(&a2, 50);
+  account_withdraw(&a1, 100);
+  account_transfer(&a2, &a1, 25);   
+  account_print(&a1);
+  account_print(&a2);
+}
+
+Link to download file: main1.c
+
+Download main1.c
+
+Output
+In the output below, the dollar sign represents the shell prompt and the name of the executable file is main1
+
+$ ./main1                          
+1 Hermione Granger $1425
+2 Jack Swallow $425
+
+Part 2
+
+Write a program that reads account transactions from the standard input stream and then executes those transactions. The main source file (that includes a function named main) for this program should be main2.c and your Makefile for this program should produce an executable named main2
+
+Make an array of Account structs to keep track of the accounts. Define a constant (using #define or the const keyword) named MAX_ACCOUNTS that specifies the maximum number of accounts that can be created.
+
+The program should produce output showing the result of each transaction. Output should be similar to the sample output shown below. In particular, error messages should include the same information shown in the sample output, like invalid IDs, and amounts. This program is like a unit test for the account data structure, so the output needs to include enough information to make sure that the functions that work with the data structure are working correctly.
+Format of input lines
+
+Each line of input will have a transaction or a command as the first thing on the line. Items on each input line will be separated by one or more spaces or tabs. Here is a list of account transactions and commands:
+
+■ new
+For a new transaction, your program should create (or initialize) an account. If the maximum number of accounts has already been created then your program should print an error message and not create an account. To create an account, initialize an Account struct in the array, using the account_init function. Your program should assign an account number to the account and pass that number to account_init.
+
+Input lines for new transactions will have the word new, followed by the initial balance of the new account, followed by the first and last names of the account owner. The initial balance will always be an integer. There will always be exactly two names for the account owner.
+
+Here is an example of an input line for a new account:
+
+new 1000 Hermione Granger
+
+The initial balance for the account is $1000. The first name is Hermione and the last name is Granger. Those two names should be combined into one null-terminated string which is passed to account_init.
+
+■ deposit
+For a deposit transaction, your program should get the account number and the deposit amount from the input line, use the account number to get the address of the correct Account struct, and then call account_deposit.
+
+Example:
+deposit 1 400
+
+■ withdraw
+For a withdraw transaction, your program should get the account number and the withdrawal amount from the input line, use the account number to get the address of the correct Account struct, and then call account_withdraw.
+
+Example:
+withdraw 2 100
+
+■ transfer
+For a transfer transaction, your program should get two account numbers, a source account, from which money will be taken, and a destination account, to which money will be added. Your program should use those two account numbers to get the addresses of the correct Account structs, and then call account_transfer.
+
+Example:
+transfer 2 1 100
+
+■ print
+For the print command your program should call the account_print function for each account that has been created.
+
+■ quit
+When your program reads the quit command it should print a message and then terminate.
+Sample input and output
+
+Here is some sample input, followed by the output that should be produced for that input:
+
+Input
+
+new 1000 Hermione Granger  
+new 500 Jack Swallow  
+transfer 2 1 100
+transfer 1 2 5000
+print
+deposit 1 400
+deposit 3 1000
+withdraw 2 100
+new 700 Bilbo Baggins
+new 900 Leia Organa
+new 830 Princess Zelda
+new 3000 The Phantom
+withdraw 1 5000
+withdraw 2 -50
+print
+quit
+
+Link to download file: in.txt
+Download in.txt
+
+Output
+
+In this example the name of the executable file is main2 and the standard input is redirected from the file in.txt. The value of MAX_ACCOUNTS is 5.
+
+$ ./main2 < in.txt
+New account: 1 Hermione Granger $1000
+
+New account: 2 Jack Swallow $500
+
+Transfer Amount: $100
+From: Jack Swallow New Balance: $400
+To: Hermione Granger New Balance $1100
+
+Invalid transfer amount: $5000
+
+ACCOUNTS
+1 Hermione Granger $1100
+2 Jack Swallow $400
+
+Deposit Amount: $400 Owner: Hermione Granger New Balance: $1500
+
+Invalid account number: 3
+
+Withdrawal Amount: $100 Owner: Jack Swallow New Balance: $300
+
+New account: 3 Bilbo Baggins $700
+
+New account: 4 Leia Organa $900
+
+New account: 5 Princess Zelda $830
+
+Maximum number of accounts. No more can be created.
+
+1 Hermione Granger $1500
+Invalid withdrawal amount: $5000
+
+2 Jack Swallow $300
+Invalid withdrawal amount: $-50
+
+ACCOUNTS
+1 Hermione Granger $1500
+2 Jack Swallow $300
+3 Bilbo Baggins $700
+4 Leia Organa $900
+5 Princess Zelda $830
+
+Good-bye
+
+$
+
+Notes
+Redirecting the standard input stream
+
+In Linux (and other Unix-like systems), MacOS, and Windows command shells you can use a less-than sign (<) to redirect the standard input stream, like this:
+
+$ ./main2 < in.txt
+
+With the standard input stream redirected like that, the program (main2 in this example) will get input from the file in.txt just as if the text in the file had been typed on the keyboard.
+
+The program does not have to be written any differently to work with input redirection.
+Constraints and error checking
+
+—Withdrawal, deposit, and transfer amounts must be greater than zero. Initial balances must also be greater than zero.
+—Withdrawal amounts must be less than or equal to the account balance.
+—Transfer amounts must be less than or equal to the source account balance.
+Simplifications
+
+—All names for account owners will have a first name and a last name, no more and no less.
+—First and last names combined, with a space between them, will not be more than 50 characters.
+—All amounts and IDs will be integers.
+—IDs can be used as an index into an array.
+—Commands can be identified by the first character of the command.
+—Make a named constant for the maximum number of accounts. The name of that constant should be MAX_ACCOUNTS and its value should be 5.
+Parsing input
+
+I recommend that you use fgets to read line of input. Then look at the first character of the line to determine what command is on that line: n for a new account, t for a transfer, and so on.
+
+After you know what command is on the input line, use sscanf to get the values you need from the input line.
+
+There is more than one kind of scanf function and more than one kind of gets function. Make sure you use sscanf (with two Ss at the beginning) and fgets (with an F at the beginning).
+Compiling
+
+I recommend that you use gcc (GNU C compiler) to compile your program. All programming assignments for this class must compile and run on the server, so you will need to know how gcc works.
+Debugging
+
+I suggest that you use print statements for debugging your program. Debugging with print statements is a useful skill when working on a remote server, and will be very helpful in this class. Please comment out or remove your debugging print statements before submitting your program.
+
+One situation where you will want to use a debugging tool rather than only using print statements is when your program crashes. It's very helpful to find out where your program is crashing, and you can use that with the gdb (GNU Debugger) tool. You can read about how to use gdb on this page: Linux Basics 4: Shell scripts and gdb
+Submission
+
+Put the following files in a tar file:
+
+    account.c
+    account.h - From the assignment spec
+    main2.c - Reads transactions from the standard input and executes them.
+    Makefile - Used to compile your program. It should produce an executable file named main2
+
+You don't need to turn in main1.c or any executable files. Don't include any directories or any files other than the ones listed above in your tar file.
