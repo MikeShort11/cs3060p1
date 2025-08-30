@@ -12,3 +12,8 @@ int main(int argc, char *argv[]) {
   account_print(&a1);
   account_print(&a2);
 }
+
+// expeted output
+//$ ./main1                          
+//1 Hermione Granger $1425
+//2 Jack Swallow $425
